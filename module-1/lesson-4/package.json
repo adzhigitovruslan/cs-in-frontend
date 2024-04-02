@@ -1,0 +1,12 @@
+{
+	"name": "bcd-encoding",
+	"version": "1.0.0",
+	"description": "",
+	"main": "hm-4.js",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Ruslan Adzhigitov",
+	"license": "ISC"
+}
