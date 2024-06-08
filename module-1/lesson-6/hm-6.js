@@ -16,7 +16,7 @@ class LinkedList {
 		let current = this.first
 		return {
 			next() {
-				if (!current) return { done: true }
+				if (!current) return { value: undefined, done: true }
 
 				let value = current.value
 				current = current.next
