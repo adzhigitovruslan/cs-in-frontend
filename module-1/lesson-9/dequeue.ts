@@ -1,3 +1,5 @@
+import {equal} from "node:assert"
+
 type DequeueTypes =
     Uint8Array |
     Uint8ClampedArray |
@@ -16,12 +18,18 @@ class ListNode<T> {
     value: T
     prev: ListNode<T> | null
     next: ListNode<T> | null
-    constructor(value: T) {
+    constructor(value: T, {prev, next}: {prev?: ListNode<T> | null, next?: ListNode<T> | null}) {
         this.value = value
-        this.prev = null
-        this.next = null
 
-        return this
+        if (prev != null) {
+            this.prev = prev
+            this.prev.next = this
+        }
+
+        if (next != null) {
+            this.next = next
+            this.next.prev = this
+        }
     }
 }
 
@@ -36,15 +44,14 @@ class LinkedList<T> {
     pushLeft(value: T) {
         const {first} = this
 
-        this.first = new ListNode(value);
-        this.first.next = first
+        this.first = new ListNode(value, {next: first});
 
         if (this.last != null) return;
 
         this.last = this.first
     }
 
-    popLeft(value: T) {
+    popLeft() {
         const {first} = this
 
         if(this.first == null || this.first === this.last) {
@@ -61,15 +68,14 @@ class LinkedList<T> {
     pushRight(value: T) {
         const {last} = this
 
-        this.last = new ListNode(value);
-        this.last.prev = last
+        this.last = new ListNode(value, {prev: last});
 
         if (this.first != null) return;
 
         this.first = this.last
     }
 
-    popRight(value: T) {
+    popRight() {
         const {last} = this
 
         if (this.last == null || this.last === this.first) {
@@ -132,6 +138,12 @@ class Dequeue<T extends DequeueTypes> {
 
         this.firstIndex = firstIndex
         this.list.first.value[firstIndex] = value
+
+        if (this.lastIndex == null) {
+            this.lastIndex = this.firstIndex
+        }
+
+        return this.length
     }
 
     pushRight(value: T extends BigUint64Array | BigInt64Array ? bigint : number) {
@@ -144,7 +156,7 @@ class Dequeue<T extends DequeueTypes> {
         } else {
             lastIndex++;
 
-            if (lastIndex > this.capacity - 1) {
+            if (lastIndex >= this.capacity) {
                 lastIndex = 0
                 this.list.pushRight(new this.TypedArray(this.capacity))
             }
@@ -152,12 +164,23 @@ class Dequeue<T extends DequeueTypes> {
 
         this.lastIndex = lastIndex
         this.list.last.value[lastIndex] = value
+
+        if (this.firstIndex == null) {
+            this.firstIndex = this.lastIndex
+        }
+
+        return this.length
     }
 
-    popRight() {
-        this.length--;
-
+    popRight(): (T extends BigUint64Array | BigInt64Array ? bigint : number) | undefined {
         let {lastIndex} = this
+
+        if (lastIndex == null) {
+            return undefined
+        }
+
+        this.length--;
+        const value = this.list.last.value[lastIndex]
 
         if (lastIndex === this.firstIndex && this.list.first === this.list.last) {
             this.firstIndex = null
@@ -165,11 +188,79 @@ class Dequeue<T extends DequeueTypes> {
         } else {
             lastIndex--;
 
+            if (lastIndex < 0) {
+                lastIndex = this.capacity - 1;
+                this.list.popRight()
+            }
 
+            this.lastIndex = lastIndex
+
+            if (lastIndex < this.firstIndex && this.list.first === this.list.last) {
+                this.firstIndex = lastIndex
+            }
         }
 
-
+            return value as any
     }
 
-    popLeft(value: T extends BigUint64Array | BigInt64Array ? bigint : number) {}
+    popLeft(): (T extends BigUint64Array | BigInt64Array ? bigint : number) | undefined {
+        let {firstIndex} = this
+        if(firstIndex == null) {
+            return undefined
+        }
+
+        this.length--;
+        const value = this.list.first.value[firstIndex]
+
+        if (firstIndex === this.lastIndex && this.list.first === this.list.last) {
+            this.firstIndex = null
+            this.lastIndex = null
+        } else {
+            firstIndex++;
+
+            if(firstIndex > this.capacity - 1) {
+                firstIndex = 0
+                this.list.popLeft()
+            }
+
+            this.firstIndex = firstIndex
+
+            if (firstIndex > this.lastIndex && this.list.first === this.list.last) {
+                this.lastIndex = firstIndex
+            }
+
+            return value as any
+        }
+    }
 }
+
+const dequeue = new Dequeue(Uint8Array,  64)
+
+equal(dequeue.pushLeft(1), 1)
+equal(dequeue.pushLeft(2), 2)
+equal(dequeue.pushLeft(3), 3)
+
+equal(dequeue.length, 3)
+
+equal(dequeue.popLeft(), 3)
+
+equal(dequeue.pushLeft(10), 3)
+
+equal(dequeue.pushRight(4), 4)
+equal(dequeue.pushRight(5),5)
+equal(dequeue.pushRight(6), 6)
+equal(dequeue.pushRight(60), 7)
+equal(dequeue.pushRight(255), 8)
+
+equal(dequeue.popRight(), 255)
+
+equal(dequeue.pushLeft(1), 8)
+equal(dequeue.pushLeft(2), 9)
+equal(dequeue.pushLeft(3), 10)
+
+equal(dequeue.pushRight(255), 11)
+
+console.log(...dequeue.list.values())
+
+
+
