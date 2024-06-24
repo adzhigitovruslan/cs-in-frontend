@@ -64,13 +64,13 @@ class HashMap {
         return {
             get: () => {
                 const cell = this.buffer[index]
-                console.log(index, 'get')
+
                 if (cell == null) return undefined
 
                 let el: typeof cell | null = cell
 
                 do {
-                    if (el.value[0] === key) {
+                    if (el.value[0] == key) {
                         return el.value[1]
                     }
 
@@ -84,7 +84,6 @@ class HashMap {
                 if (this.hashLength / this.buffer.length > this.occupancyRate ) {
                     this.expandHashMap()
                 }
-                console.log(index, 'set')
                 const cell = this.buffer[index]
 
                 if (cell == null) {
@@ -152,13 +151,13 @@ class HashMap {
 
     }
     get(key: unknown) {
-        this.entry(key).get()
+        return this.entry(key).get()
     }
     set(key: unknown, value: unknown) {
         this.entry(key).set(value)
     }
     has(key: unknown) {
-        this.entry(key).has()
+        return this.entry(key).has()
     }
     delete(key: unknown) {
         this.entry(key).delete()
@@ -198,4 +197,4 @@ const map = new HashMap(32)
 
 map.set('foo', 1);
 map.set(42, 10);
-console.log(map.get(42), map.buffer);          // 10
+console.log(map.get(42), map.buffer);   // 10
