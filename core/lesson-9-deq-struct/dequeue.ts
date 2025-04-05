@@ -1,16 +1,5 @@
 import {equal} from "node:assert"
-
-type DequeueTypes =
-    Uint8Array |
-    Uint8ClampedArray |
-    Int8Array |
-    Uint16Array |
-    Uint32Array |
-    Int32Array |
-    Float32Array |
-    Float64Array |
-    BigUint64Array |
-    BigInt64Array
+import {typedArrayTypes} from "../types/typedArray";
 
 type TypedArray<T> = new (capacity: number) => T;
 
@@ -98,7 +87,7 @@ class LinkedList<T> {
     }
 }
 
-class Dequeue<T extends DequeueTypes> {
+class Dequeue<T extends typedArrayTypes> {
     length: number = 0
     readonly capacity: number
     readonly TypedArray: TypedArray<T>
@@ -261,6 +250,3 @@ equal(dequeue.pushLeft(3), 10)
 equal(dequeue.pushRight(255), 11)
 
 console.log(...dequeue.list.values())
-
-
-

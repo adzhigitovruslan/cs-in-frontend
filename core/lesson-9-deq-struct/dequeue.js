@@ -1,7 +1,7 @@
 "use strict";
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -29,11 +29,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var node_assert_1 = require("node:assert");
 var ListNode = /** @class */ (function () {
-    function ListNode(value) {
+    function ListNode(value, _a) {
+        var prev = _a.prev, next = _a.next;
         this.value = value;
-        this.prev = null;
-        this.next = null;
-        return this;
+        if (prev != null) {
+            this.prev = prev;
+            this.prev.next = this;
+        }
+        if (next != null) {
+            this.next = next;
+            this.next.prev = this;
+        }
     }
     return ListNode;
 }());
@@ -45,8 +51,7 @@ var LinkedList = /** @class */ (function () {
     };
     LinkedList.prototype.pushLeft = function (value) {
         var first = this.first;
-        this.first = new ListNode(value);
-        this.first.next = first;
+        this.first = new ListNode(value, { next: first });
         if (this.last != null)
             return;
         this.last = this.first;
@@ -65,8 +70,7 @@ var LinkedList = /** @class */ (function () {
     };
     LinkedList.prototype.pushRight = function (value) {
         var last = this.last;
-        this.last = new ListNode(value);
-        this.last.prev = last;
+        this.last = new ListNode(value, { prev: last });
         if (this.first != null)
             return;
         this.first = this.last;
@@ -206,21 +210,21 @@ var Dequeue = /** @class */ (function () {
     };
     return Dequeue;
 }());
-var dequeue = new Dequeue(Uint16Array, 3);
+var dequeue = new Dequeue(Uint8Array, 64);
 (0, node_assert_1.equal)(dequeue.pushLeft(1), 1);
 (0, node_assert_1.equal)(dequeue.pushLeft(2), 2);
 (0, node_assert_1.equal)(dequeue.pushLeft(3), 3);
 (0, node_assert_1.equal)(dequeue.length, 3);
-(0, node_assert_1.equal)(dequeue.popLeft(), 3); // Удаляет с начала, возвращает удаленный элемент - 3
+(0, node_assert_1.equal)(dequeue.popLeft(), 3);
 (0, node_assert_1.equal)(dequeue.pushLeft(10), 3);
 (0, node_assert_1.equal)(dequeue.pushRight(4), 4);
 (0, node_assert_1.equal)(dequeue.pushRight(5), 5);
 (0, node_assert_1.equal)(dequeue.pushRight(6), 6);
 (0, node_assert_1.equal)(dequeue.pushRight(60), 7);
-(0, node_assert_1.equal)(dequeue.pushRight(605), 8);
-(0, node_assert_1.equal)(dequeue.popRight(), 605);
+(0, node_assert_1.equal)(dequeue.pushRight(255), 8);
+(0, node_assert_1.equal)(dequeue.popRight(), 255);
 (0, node_assert_1.equal)(dequeue.pushLeft(1), 8);
 (0, node_assert_1.equal)(dequeue.pushLeft(2), 9);
 (0, node_assert_1.equal)(dequeue.pushLeft(3), 10);
+(0, node_assert_1.equal)(dequeue.pushRight(255), 11);
 console.log.apply(console, dequeue.list.values());
-console.log(dequeue.list);

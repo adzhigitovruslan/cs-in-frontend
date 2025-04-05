@@ -1,0 +1,10 @@
+digraph "example" {
+  "0" [color="blue"];
+  "1" [color="red"];
+  "2" [color="yellow"];
+  "3" [color="green"];
+  "4" [color="purple"];
+  "5" [color="magenta"];
+  "1" -> "2" [label="3"];
+  "3" -> "4" [label="4"];
+}
