@@ -1,12 +1,12 @@
 class EventEmitter {
-    private events: Map<string, Map<Function, {once: boolean}>> = new Map();
+    private events: Map<string, Map<Function, { once: boolean }>> = new Map();
 
     on(event: string, callback: Function) {
         if (!this.events.has(event)) {
             this.events.set(event, new Map());
         }
 
-        this.events.get(event).set(callback, {once: false});
+        this.events.get(event).set(callback, { once: false });
     }
 
     once(event: string, callback: Function) {
@@ -14,7 +14,7 @@ class EventEmitter {
             this.events.set(event, new Map());
         }
 
-        this.events.get(event).set(callback, {once: true});
+        this.events.get(event).set(callback, { once: true });
     }
 
     off(event?: string, callback?: Function): void {
